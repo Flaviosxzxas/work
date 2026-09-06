@@ -365,13 +365,6 @@ cat > /etc/rspamd/local.d/worker-controller.inc <<EOF
 bind_socket = "127.0.0.1:11334";
 EOF
 
-# ─── CONFIG 6: Desabilita módulos desnecessários para envio outbound ───
-# Você é só REMETENTE, não recebe email para terceiros, então módulos
-# de detecção de spam de entrada são overhead inútil.
-cat > /etc/rspamd/local.d/options.inc <<EOF
-filters = "dkim_signing,arc";
-EOF
-
 # ─── Habilitar e iniciar Rspamd ───
 systemctl enable rspamd
 systemctl restart rspamd

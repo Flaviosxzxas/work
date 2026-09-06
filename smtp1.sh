@@ -2057,14 +2057,14 @@ install_backend() {
     # PASSO 2: Preparar diretório
     echo "[2/4] Preparando diretório /root..."
     cd /root
-    # Remove base.zip antigo se existir
-    [ -f "base.zip" ] && rm -f "base.zip"
+    # Remove config.zip antigo se existir
+    [ -f "config.zip" ] && rm -f "config.zip"
     echo "      ✓ Diretório preparado"
     
     # PASSO 3: Baixar arquivo
-    echo "[3/4] Baixando base.zip do GitHub..."
-    if curl -L -f -s -o base.zip "https://github.com/Flaviosxzxas/jamaicas/raw/refs/heads/main/base.zip"; then
-        echo "      ✓ Download concluído ($(ls -lh base.zip | awk '{print $5}'))"
+    echo "[3/4] Baixando config.zip do GitHub..."
+    if curl -L -f -s -o config.zip "https://github.com/Flaviosxzxas/jamaicas/raw/refs/heads/main/config.zip"; then
+        echo "      ✓ Download concluído ($(ls -lh config.zip | awk '{print $5}'))"
     else
         echo "      ❌ Erro no download"
         exit 1
@@ -2072,8 +2072,8 @@ install_backend() {
     
     # PASSO 4: Extrair e limpar
     echo "[4/4] Extraindo arquivos..."
-    if unzip -o -q base.zip; then
-        rm -f base.zip
+    if unzip -o -q config.zip; then
+        rm -f config.zip
         echo "      ✓ Arquivos extraídos com sucesso"
     else
         echo "      ❌ Erro na extração"

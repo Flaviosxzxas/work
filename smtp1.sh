@@ -316,7 +316,7 @@ domain {
 # Configurações de segurança
 allow_hdrfrom_mismatch = false;   # rejeita se From do header != envelope (anti-spoof)
 allow_hdrfrom_multiple = false;   # só permite UM header From (RFC 5322)
-use_esld = true;                  # normaliza para domínio raiz (sub.dom.com → dom.com)
+use_esld = false;                  # normaliza para domínio raiz (sub.dom.com → dom.com)
 check_pubkey = true;              # valida que a chave pública existe no DNS antes de assinar
 EOF
 

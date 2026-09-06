@@ -294,7 +294,7 @@ echo "✓ Chaves DKIM geradas em /var/lib/rspamd/dkim/$ServerName/"
 # Define quando assinar e qual chave usar
 cat > /etc/rspamd/local.d/dkim_signing.conf <<EOF
 # Habilita assinatura DKIM
-enabled = true;
+enabled = false;
 
 # Assina apenas saída (não entrada)
 sign_authenticated = true;   # assina mensagens de usuários autenticados (Supermailer)

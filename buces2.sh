@@ -2045,7 +2045,7 @@ apt-get install -y postfix-pcre >/dev/null 2>&1 || true
 
 # Endereços SEM +tag (dmarc-reports, postmaster, replies legítimos) -> entrega local pro root
 cat > /etc/postfix/virtual_pcre <<EOF
-/^[^@]+@${ServerName}$/    root
+/^[^@]+@\Q${ServerName}\E\$/    root@localhost
 EOF
 chmod 0644 /etc/postfix/virtual_pcre
 

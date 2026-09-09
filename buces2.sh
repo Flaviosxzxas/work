@@ -137,7 +137,7 @@ DOTS=$(echo "$ServerName" | tr -cd '.' | wc -c)
 # Verifica se o ServerName termina com TLD composto (dois níveis)
 if echo "$ServerName" | grep -qE "\.($KNOWN_DOUBLE_TLDS)$"; then
     # Para TLDs compostos: pega os últimos 3 componentes
-    # Exemplo: distribuidor1.agsadent.com.mx → agsadent.com.mx
+    # Exemplo: mta01.agsadent.com.mx → agsadent.com.mx
     Domain=$(echo "$ServerName" | awk -F. '{print $(NF-2)"."$(NF-1)"."$NF}')
 elif [ "$DOTS" -eq 1 ]; then
     # Se tem apenas 1 ponto, é o domínio raiz
@@ -145,11 +145,14 @@ elif [ "$DOTS" -eq 1 ]; then
     Domain="$ServerName"
 else
     # Para TLDs simples com subdomínio: pega os últimos 2 componentes
-    # Exemplo: mail.example.com → example.com
+    # Exemplo: mta01.example.com → example.com
     Domain=$(echo "$ServerName" | awk -F. '{print $(NF-1)"."$NF}')
 fi
 
-DKIMSelector=$(echo "$ServerName" | awk -F[.:] '{print $1}')
+# Extrai o primeiro rótulo do ServerName em minúsculas (Seletor DKIM)
+# Exemplo: mta01.catrionajreynolds.com → mta01
+DKIMSelector="${ServerName%%.*}"
+DKIMSelector="${DKIMSelector,,}"
 
 MailServerName="mail.$ServerName"
 

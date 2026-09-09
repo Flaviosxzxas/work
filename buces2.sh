@@ -2018,7 +2018,6 @@ bounce@$ServerName          discard:
 tls-reports@$ServerName     discard:
 dmarc-reports@$ServerName   discard:
 $ServerName                 discard:
-$ServerName             discard:
 EOF
 
 # gerar db

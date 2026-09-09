@@ -154,7 +154,6 @@ fi
 DKIMSelector="${ServerName%%.*}"
 DKIMSelector="${DKIMSelector,,}"
 
-MailServerName="mail.$ServerName"
 
 if [ -z "$Domain" ] || [ -z "$DKIMSelector" ]; then
   echo "Erro: Não foi possível calcular o Domain ou DKIMSelector. Verifique o ServerName."
@@ -243,16 +242,16 @@ dns_cloudflare_api_key = $CloudflareAPI" > /root/.secrets/cloudflare.cfg
 
 cat <<EOF > /etc/hosts
 127.0.0.1   localhost
-$ServerIP   $MailServerName
+$ServerIP   $ServerName
 EOF
 
-echo -e "$MailServerName" > /etc/hostname
-hostnamectl set-hostname "$MailServerName"
+echo -e "$ServerName" > /etc/hostname
+hostnamectl set-hostname "$ServerName"
 
 certbot certonly --non-interactive --agree-tos --register-unsafely-without-email \
   --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.cfg \
   --dns-cloudflare-propagation-seconds 60 --rsa-key-size 4096 \
-  -d $ServerName -d $MailServerName -d mta-sts.$ServerName -d unsubscribe.$ServerName
+  -d $ServerName -d mta-sts.$ServerName -d unsubscribe.$ServerName
 
 echo "================================================= Corrigir SyntaxWarning em cloudflare.py ================================================="
 
@@ -585,7 +584,7 @@ echo "================================================= POSTFIX ================
 # Ajusta o debconf sem aspas simples desnecessárias
 debconf-set-selections <<< "postfix postfix/mailname string $ServerName"
 debconf-set-selections <<< "postfix postfix/main_mailer_type select Internet Site"
-debconf-set-selections <<< "postfix postfix/destinations string '$MailServerName, localhost.$ServerName, localhost'"
+debconf-set-selections <<< "postfix postfix/destinations string '$ServerName, localhost.$ServerName, localhost'"
 
 # Instalar Postfix e outros
 DEBIAN_FRONTEND=noninteractive apt-get install -y postfix pflogsumm
@@ -689,7 +688,7 @@ smtp_tls_note_starttls_offer = yes
 # Base
 mydomain = $ServerName
 myorigin = $ServerName
-#mydestination = $MailServerName, localhost.$ServerName, localhost
+#mydestination = $ServerName, localhost.$ServerName, localhost
 mydestination = localhost
 virtual_alias_domains = $ServerName
 relayhost =
@@ -1243,13 +1242,13 @@ DKIMCode=$(echo "$DKIMCode" | tr -d '\n' | tr -s ' ')
 EscapedDKIMCode=$(printf '%s' "$DKIMCode" | sed 's/\"/\\\"/g')
 
 create_or_update_record "$ServerName" "A" "$ServerIP" ""
-create_or_update_record "$MailServerName" "A" "$ServerIP" ""
+create_or_update_record "$ServerName" "A" "$ServerIP" ""
 
 # SPF limpo: esta VPS/IP é o único remetente autorizado
 create_or_update_record "$ServerName" "TXT" "\"v=spf1 ip4:$ServerIP -all\"" ""
 
 # SPF para o hostname usado no HELO/EHLO (resolve SPF_HELO_NONE)
-create_or_update_record "$MailServerName" "TXT" "\"v=spf1 ip4:$ServerIP -all\"" ""
+create_or_update_record "$ServerName" "TXT" "\"v=spf1 ip4:$ServerIP -all\"" ""
 
 # DMARC - domínio novo + envio em massa: fase de monitoramento
 create_or_update_record "_dmarc.$ServerName" "TXT" "\"v=DMARC1; p=none; sp=none; pct=100; rua=mailto:dmarc-reports@$ServerName; adkim=r; aspf=r; fo=1\"" ""
@@ -1264,7 +1263,7 @@ create_or_update_record "_dmarc.$ServerName" "TXT" "\"v=DMARC1; p=none; sp=none;
 create_or_update_record "${DKIMSelector}._domainkey.$ServerName" "TXT" "\"v=DKIM1; h=sha256; k=rsa; p=$EscapedDKIMCode\"" ""
 
 # MX apontando para o host SMTP real
-create_or_update_record "$ServerName" "MX" "$MailServerName" "10"
+create_or_update_record "$ServerName" "MX" "$ServerName" "10"
 # ════════════════════════════════════════════════════════════
 # MTA-STS + TLS-RPT (Gmail, Microsoft 365, Yahoo valorizam)
 # ════════════════════════════════════════════════════════════
@@ -1910,7 +1909,7 @@ mkdir -p /var/www/mta-sts/.well-known
 cat > /var/www/mta-sts/.well-known/mta-sts.txt <<EOF
 version: STSv1
 mode: enforce
-mx: $MailServerName
+mx: $ServerName
 max_age: 604800
 EOF
 
@@ -2019,7 +2018,7 @@ bounce@$ServerName          discard:
 tls-reports@$ServerName     discard:
 dmarc-reports@$ServerName   discard:
 $ServerName                 discard:
-$MailServerName             discard:
+$ServerName             discard:
 EOF
 
 # gerar db

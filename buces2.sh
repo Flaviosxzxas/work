@@ -1118,7 +1118,8 @@ if ! command -v jq &> /dev/null; then
   apt-get install -y jq
 fi
 
-DKIMCode=$(/root/dkimcode.sh /var/lib/rspamd/dkim/$ServerName/default.pub)
+# Leitura da chave pública usando o seletor dinâmico
+DKIMCode=$(/root/dkimcode.sh "/var/lib/rspamd/dkim/$ServerName/${DKIMSelector}.pub")
 
 echo "===== DEPURAÇÃO: ANTES DE OBTER ZONA CLOUDFLARE ====="
 echo "DKIMCode: $DKIMCode"

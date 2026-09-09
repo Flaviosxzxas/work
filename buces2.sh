@@ -623,8 +623,8 @@ echo "✓ Bounces do sistema serão descartados em /dev/null"
 echo "================================================= POSTFIX MAIN CF ================================================="
 # /etc/postfix/main.cf
 cat <<EOF > /etc/postfix/main.cf
-myhostname = $MailServerName
-smtp_helo_name = $MailServerName
+myhostname = $ServerName
+smtp_helo_name = $ServerName
 smtpd_helo_required = yes
 smtpd_banner = \$myhostname ESMTP
 biff = no

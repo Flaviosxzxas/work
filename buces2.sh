@@ -117,6 +117,15 @@ if [[ ! "$ServerName" =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
   exit 1
 fi
 
+# Extrai tudo antes do primeiro ponto (.) no ServerName
+DKIMSelector="${ServerName%%.*}"
+
+# Garantir que o seletor fique em letras minúsculas (padrão de RFC para DNS)
+DKIMSelector="${DKIMSelector,,}"
+
+echo "ServerName definido como: $ServerName"
+echo "DKIMSelector extraído como: $DKIMSelector"
+
 echo "================================================= Variáveis derivadas ================================================="
 
 # Lista de TLDs compostos conhecidos
@@ -263,23 +272,23 @@ systemctl start redis-server
 mkdir -p /var/lib/rspamd/dkim/$ServerName
 
 rspamadm dkim_keygen \
-  -s default \
+  -s $DKIMSelector \
   -b 2048 \
   -d $ServerName \
-  -k /var/lib/rspamd/dkim/$ServerName/default.private \
-  > /var/lib/rspamd/dkim/$ServerName/default.pub
+  -k /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.private \
+  > /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.pub
 
 chown -R _rspamd:_rspamd /var/lib/rspamd/dkim
-chmod 600 /var/lib/rspamd/dkim/$ServerName/default.private
-chmod 644 /var/lib/rspamd/dkim/$ServerName/default.pub
+chmod 600 /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.private
+chmod 644 /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.pub
 
-if [ ! -f /var/lib/rspamd/dkim/$ServerName/default.private ] || \
-   [ ! -f /var/lib/rspamd/dkim/$ServerName/default.pub ]; then
+if [ ! -f /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.private ] || \
+   [ ! -f /var/lib/rspamd/dkim/$ServerName/$DKIMSelector.pub ]; then
     echo "ERRO: Falha ao gerar chaves DKIM via Rspamd!"
     exit 1
 fi
 
-echo "✓ Chaves DKIM geradas em /var/lib/rspamd/dkim/$ServerName/"
+echo "✓ Chaves DKIM geradas em /var/lib/rspamd/dkim/$ServerName/ com seletor '$DKIMSelector'"
 
 # =================================================
 # DKIM SIGNING
@@ -323,8 +332,8 @@ domain {
   $ServerName {
     selectors [
       {
-        path = "/var/lib/rspamd/dkim/$ServerName/default.private";
-        selector = "default";
+        path = "/var/lib/rspamd/dkim/$ServerName/$DKIMSelector.private";
+        selector = "$DKIMSelector";
       }
     ]
   }
@@ -361,8 +370,8 @@ domain {
   $ServerName {
     selectors [
       {
-        path = "/var/lib/rspamd/dkim/$ServerName/default.private";
-        selector = "default";
+        path = "/var/lib/rspamd/dkim/$ServerName/$DKIMSelector.private";
+        selector = "$DKIMSelector";
       }
     ]
   }
@@ -1248,7 +1257,7 @@ create_or_update_record "_dmarc.$ServerName" "TXT" "\"v=DMARC1; p=none; sp=none;
 # create_or_update_record "_dmarc.$ServerName" "TXT" "\"v=DMARC1; p=reject; sp=reject; pct=100; rua=mailto:dmarc-reports@$ServerName; adkim=r; aspf=r; fo=1\"" ""
 
 # DKIM: precisa bater com o selector usado pelo Rspamd
-create_or_update_record "default._domainkey.$ServerName" "TXT" "\"v=DKIM1; h=sha256; k=rsa; p=$EscapedDKIMCode\"" ""
+create_or_update_record "${DKIMSelector}._domainkey.$ServerName" "TXT" "\"v=DKIM1; h=sha256; k=rsa; p=$EscapedDKIMCode\"" ""
 
 # MX apontando para o host SMTP real
 create_or_update_record "$ServerName" "MX" "$MailServerName" "10"

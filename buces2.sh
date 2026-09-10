@@ -1243,7 +1243,6 @@ DKIMCode=$(echo "$DKIMCode" | tr -d '\n' | tr -s ' ')
 EscapedDKIMCode=$(printf '%s' "$DKIMCode" | sed 's/\"/\\\"/g')
 
 create_or_update_record "$ServerName" "A" "$ServerIP" ""
-create_or_update_record "$ServerName" "A" "$ServerIP" ""
 
 # SPF limpo: esta VPS/IP é o único remetente autorizado
 create_or_update_record "$ServerName" "TXT" "\"v=spf1 ip4:$ServerIP -all\"" ""

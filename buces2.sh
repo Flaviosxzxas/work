@@ -1155,16 +1155,16 @@ create_or_update_record() {
   local record_name=$1
   local record_type=$2
   local record_content=$3
-  local record_ttl=120
+  local record_ttl=1
   local record_priority=$4
   local record_proxied=false
 
   # Definir TTL conforme tipo de registro
   case "$record_type" in
-    MX)  record_ttl=3600 ;;     # 1h
-    TXT) record_ttl=3600 ;;     # 1h (SPF, DKIM, DMARC)
-    A)   record_ttl=1800 ;;     # 30min a 1h para IPs
-    *)   record_ttl=3600 ;;     # Padrão
+    MX)  record_ttl=300 ;;      # 5 minutos
+    TXT) record_ttl=300 ;;      # 5 minutos (SPF, DKIM, DMARC)
+    A)   record_ttl=120 ;;      # 2 minutos (IP da VPS)
+    *)   record_ttl=300 ;;      # Padrão (CAA, etc.)
   esac
 
   echo "===== DEPURAÇÃO: ANTES DE OBTER DETALHES DO REGISTRO ====="

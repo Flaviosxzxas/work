@@ -744,7 +744,6 @@ cat > /etc/postfix/header_checks <<'HCEOF'
 /^Received:.*127\.0\.0\.1/           IGNORE
 /^Received:.*localhost/              IGNORE
 /^Received:.*from userid/            IGNORE
-/^X-Mailer:/                         IGNORE
 /^X-PHP-Originating-Script:/         IGNORE
 /^X-Originating-IP:/                 IGNORE
 /^X-Source:/                         IGNORE

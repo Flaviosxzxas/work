@@ -667,18 +667,20 @@ smtpd_tls_key_file  = /etc/letsencrypt/live/$ServerName/privkey.pem
 tls_preempt_cipherlist = yes
 
 # ==============================================================================
-# TLS - SAÍDA (compatibilidade ampla)
+# TLS - SAÍDA (Compatibilidade Alta + Reputação Máxima)
 # ==============================================================================
 smtp_tls_security_level = may
 smtp_tls_loglevel = 1
 smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
 
-smtp_tls_protocols = !SSLv2, !SSLv3
-smtp_tls_mandatory_protocols = !SSLv2, !SSLv3
+# Bloqueia apenas protocolos obsoletos (SSLv2, SSLv3, TLS 1.0, TLS 1.1)
+smtp_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtp_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 
-smtp_tls_ciphers = medium
-smtp_tls_mandatory_ciphers = medium
-smtp_tls_exclude_ciphers = aNULL, MD5, RC4, EXPORT
+# Exige ciphers fortes para ganhar pontuação positiva nos antispams
+smtp_tls_ciphers = high
+smtp_tls_mandatory_ciphers = high
+smtp_tls_exclude_ciphers = aNULL, MD5, DES, 3DES, RC4, EXPORT
 smtp_tls_mandatory_exclude_ciphers = aNULL, MD5, DES, 3DES, RC4, EXPORT
 
 # ESCAPADO CORRETAMENTE PARA O POSTFIX EXPANDIR

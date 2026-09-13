@@ -756,6 +756,9 @@ cat > /etc/postfix/header_checks <<'HCEOF'
 /^X-Spam-Status:/                    IGNORE
 /^X-Spam-Score:/                     IGNORE
 /^X-Spam-Level:/                     IGNORE
+/^List-Unsubscribe:/                 IGNORE
+/^List-Unsubscribe-Post:/            IGNORE
+/^Precedence:.*bulk/                 IGNORE
 HCEOF
 chmod 644 /etc/postfix/header_checks
 echo "✓ Header checks configurados"
